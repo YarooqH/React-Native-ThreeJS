@@ -24,6 +24,7 @@ import stacyTex from './assets/stacy.jpg';
 import * as THREE from 'three';
 // import { OrbitControls } from '@react-three/drei/native';
 // import { OrbitControls } from 'three/examples/js/controls/OrbitControls';
+import useControls from 'r3f-native-orbitcontrols'
 
 import { MeshBasicMaterial } from 'three';
 // extend ({OrbitControls})
@@ -186,7 +187,7 @@ function StacyModel({url, url1}, props) {
   const { ref, actions, names } = useAnimations(animations)
 
   const [hovered, setHovered] = useState(false)
-  const [index, setIndex] = useState(3)
+  const [index, setIndex] = useState(8)
 
   useFrame((state, delta) =>{
     actions[names[index]].play();
@@ -285,7 +286,7 @@ const CameraControls = () => {
     <orbitControls
       ref={controls}
       args={[camera, domElement]}
-      enableZoom={false}
+      enableZoom={true}
       maxAzimuthAngle={Math.PI / 4}
       maxPolarAngle={Math.PI}
       minAzimuthAngle={-Math.PI / 4}
@@ -300,28 +301,51 @@ const CameraControls = () => {
 export default function App() {
   const [camera, setCamera] = useState(null);
 
+  function zoom(constant, camera){
+    camera.position.x = camera.position.x * constant;
+    camera.position.y = camera.position.y * constant;
+    camera.position.z = camera.position.z * constant;
+  }
+
   function Camera(props) {
     const { camera } = useThree();
+
+    // const controls = useRef();
+    // useFrame(state => controls.current.update());
+
     useEffect(() => {
       setCamera(camera);
-    }, []);
+      // zoom(1, camera);
+    });
+
+
+    // useFrame(() => {
+    //   zoom(1, camera)
+    // })
     return (
       <perspectiveCamera {...camera} />
     );
   }
+
+  // useEffect(() => {
+    // zoom(0.1, camera);
+  // }, [camera])
   // const newThree = useThree();
   // const [camera, setCamera] = useState<THREE.Camera | null>(null);
   // const [cam, setCam] = useState();
   // setCam(useThree());
 
+  const[OrbitControls, events] = useControls();
 
   // <View  style={{ flex: 1 }}>
   return (
-    // <View>
-    <OrbitControlsView
+    <View style={{flex: 1}} {...events}>
+    {/* <OrbitControlsView
           style={{ flex: 1 }}
           camera={camera}
-        > 
+          // enableZoom={true}
+          // zoom={true}
+        >  */}
     <Canvas gl={{ physicallyCorrectLights: true }} camera={{ position: [0, 0, 16], fov: 50 }} onCreated={(state) => {
       const _gl = state.gl.getContext()
       const pixelStorei = _gl.pixelStorei.bind(_gl)
@@ -335,7 +359,7 @@ export default function App() {
     }}>
       {/* <OrbitControlsView> */}
       {/* <color attach="background" args={[0x00eeff]} /> */}
-      <color attach="background" args={[0x000000]} />
+      <color attach="background" args={[0x999999]} />
       {/* <ambientLight /> */}
       {/* <directionalLight intensity={1.1} position={[0.5, 0, 0.866]} /> */}
       <directionalLight intensity={0.8} position={[-6, 2, 2]} />
@@ -359,12 +383,15 @@ export default function App() {
         {/* <JustKick url={myModel}/> */}
         {/* <newComp /> */}
         {/* <Kicks /> */}
-      </Suspense>
+        </Suspense>
       {/* <Button title="Click me"></Button> */}
-      <Camera />
+        {/* <Camera /> */}
+      {/* <CameraControls /> */}
+      <OrbitControls />
     
       </Canvas>
-    </OrbitControlsView>
+    {/* </OrbitControlsView> */}
+    </View>
     
   )
 }
